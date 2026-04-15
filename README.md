@@ -4,26 +4,24 @@
 
 Analyze your Claude Code session history to identify pain points, track improvement trends, detect knowledge gaps, and generate actionable CLAUDE.md update suggestions.
 
-## Features
-
-- **Pain Point Detection** — Automatically identifies recurring user corrections and categorizes them (state management, build errors, logic errors, publishing, etc.)
-- **Trend Tracking** — Incremental analysis with ↑↓→ trend arrows comparing current metrics to previous runs
-- **Knowledge Gap Detection** — Identifies topics that triggered excessive web searches or required user-provided documentation
-- **CLAUDE.md Suggestions** — Generates ready-to-paste rule text, checklists, and error reference tables
-- **File Hotspot Analysis** — Highlights files edited most frequently, indicating potential architectural issues
-- **Bilingual Support** — Analyzes both Chinese and English session content
-- **Zero Dependencies** — Pure Python 3.10+ standard library, no external packages needed
+[中文文档](README_CN.md)
 
 ## Installation
 
-### Option 1: Plugin Marketplace (Recommended)
+### Option 1: Claude Code Plugin Marketplace (Recommended)
 
-```bash
+```
 /plugin marketplace add iptton-ai/claude-skill-session-analyzer
 /plugin install session-analyzer
 ```
 
-### Option 2: Git Clone & Copy
+### Option 2: npx skills
+
+```
+npx skills add iptton-ai/claude-skill-session-analyzer
+```
+
+### Option 3: Clone & Copy
 
 ```bash
 git clone https://github.com/iptton-ai/claude-skill-session-analyzer.git
@@ -39,9 +37,10 @@ cp -r claude-skill-session-analyzer/skills/* ~/.claude/skills/
 ```
 
 The skill will automatically:
+
 1. Detect the current project's session directory from `~/.claude/projects/`
 2. Check for previous analysis state (enables incremental mode + trends)
-3. Run the analysis engine
+3. Run the analysis engine (direct mode for small datasets, parallel subagent mode for large)
 4. Present a structured report with pain points, trends, and suggestions
 5. Offer to apply CLAUDE.md updates
 
@@ -63,28 +62,91 @@ python3 ~/.claude/skills/session-analyzer/analyze.py \
   --output .claude/session-analysis-report.json
 ```
 
+## Features
+
+### Pain Point Detection
+
+Automatically identifies recurring user corrections using LLM-based semantic analysis and categorizes them:
+
+| Category | Description |
+|----------|-------------|
+| `state_stale` | State synchronization issues |
+| `build_error` | Build/compilation failures |
+| `logic_error` | Business logic errors |
+| `permission` | Permission issues |
+| `knowledge_gap` | Claude lacking domain knowledge |
+| `ui_issue` | UI/layout/sizing problems |
+| `wrong_assumption` | Claude making wrong assumptions |
+| `incomplete` | Incomplete implementations |
+
+### Trend Tracking
+
+Incremental analysis with trend arrows comparing current metrics to previous runs:
+
+| Metric | Trend Meaning |
+|--------|--------------|
+| Correction rate | Down is good (fewer corrections) |
+| Build success rate | Up is good |
+| Avg session turns | Down is good (more efficient) |
+
+### CLAUDE.md Suggestions
+
+Generates ready-to-paste rule text, checklists, and error reference tables based on identified pain points.
+
+### Knowledge Gap Detection
+
+Identifies topics that triggered excessive web searches or required user-provided documentation.
+
+### File Hotspot Analysis
+
+Highlights files edited most frequently, indicating potential architectural issues.
+
+### Bilingual Support
+
+Analyzes both Chinese and English session content.
+
+### Zero Dependencies
+
+Pure Python 3.10+ standard library, no external packages needed.
+
 ## Report Output
 
-The skill generates a structured report with:
+The skill generates a structured report:
+
+```
+## Session Analysis Report: <project-name>
+
+> Period: <date-range> | Sessions: <N> | Mode: <incremental/full> | Analysis: <direct/subagent>
+
+### Overview
+| Metric | Value | Trend |
+|--------|-------|-------|
+| Total sessions | N | - |
+| User corrections | N (rate%) | ↑↓→ |
+| Build success rate | N% | ↑↓→ |
 
 ### Top Pain Points
 | # | Pain Point | Evidence | Trend |
 |---|-----------|----------|-------|
 | 1 | Build errors | 14 corrections | → |
-| 2 | Business logic errors | 7 corrections | ↑ |
-| 3 | Cross-page state sync | 6 corrections | ↓ |
 
-### CLAUDE.md Suggestions
-Copyable text blocks for:
-- State management checklists
-- Build error reference tables
-- Publishing pre-flight checklists
+### CLAUDE.md Update Suggestions
+<Copyable code blocks>
 
 ### Knowledge Gaps
-Topics where Claude needed excessive web searches or user-provided documentation.
+| Topic | Searches | User-provided docs |
 
-### Detailed Metrics
-Tool usage, file hotspots, session breakdowns, message classifications.
+### Action Items (Prioritized)
+1. **[HIGH]** ...
+2. **[MEDIUM]** ...
+```
+
+## Analysis Modes
+
+| Mode | Trigger | Description |
+|------|---------|-------------|
+| Direct | Sessions <= 40 and Messages <= 150 | Single-pass analysis |
+| Subagent | Sessions > 40 or Messages > 150 | 3 parallel subagents, then merge |
 
 ## CLI Options
 
@@ -96,32 +158,20 @@ Tool usage, file hotspots, session breakdowns, message classifications.
 | `--previous-state` | No | Path to previous state JSON for trend comparison |
 | `--output` | No | Output file path (defaults to stdout) |
 
-## How It Works
+## Directory Structure
 
-1. **Session Loading** — Reads JSONL files from `~/.claude/projects/<hash>/`
-2. **Project Filtering** — Filters sessions by checking file paths in tool calls against your project name
-3. **Correction Detection** — Bilingual keyword matching for frustration/correction signals
-4. **Classification** — Categorizes corrections into: state_stale, build_error, logic_error, permission, sizing, publish, knowledge_gap
-5. **Trend Computation** — Compares current metrics against previous analysis snapshot
-6. **Suggestion Generation** — Data-driven CLAUDE.md improvement recommendations
-
-## State File
-
-Located at `<project-root>/.claude/session-analysis-report.state.json`:
-
-```json
-{
-  "last_analysis": "2026-04-15T14:30:00",
-  "metrics_snapshot": {
-    "correction_rate": 0.228,
-    "build_success_rate": 0.965,
-    "total_sessions": 50
-  },
-  "analysis_history": [
-    {"date": "2026-04-01", "correction_rate": 0.25, "total_sessions": 30},
-    {"date": "2026-04-15", "correction_rate": 0.228, "total_sessions": 50}
-  ]
-}
+```
+claude-skill-session-analyzer/
+├── README.md
+├── README_CN.md
+├── LICENSE
+├── .claude-plugin/
+│   ├── marketplace.json
+│   └── plugin.json
+└── skills/
+    └── session-analyzer/
+        ├── SKILL.md
+        └── analyze.py
 ```
 
 ## Example Results
@@ -136,6 +186,10 @@ From a 50-session HarmonyOS project analysis:
 | Build success rate | 96.5% (28/29) |
 | Top pain point | Build errors (14 corrections) |
 | Knowledge gaps | HarmonyOS API (13 searches), ArkTS (10 searches) |
+
+## Contributing
+
+Issues and Pull Requests welcome.
 
 ## License
 
