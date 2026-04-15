@@ -16,12 +16,18 @@ Analyze your Claude Code session history to identify pain points, track improvem
 
 ## Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/iptton-ai/claude-skill-session-analyzer.git
+### Option 1: Plugin Marketplace (Recommended)
 
-# Copy to Claude Code skills directory
-cp -r claude-skill-session-analyzer ~/.claude/skills/session-analyzer
+```bash
+/plugin marketplace add iptton-ai/claude-skill-session-analyzer
+/plugin install session-analyzer
+```
+
+### Option 2: Git Clone & Copy
+
+```bash
+git clone https://github.com/iptton-ai/claude-skill-session-analyzer.git
+cp -r claude-skill-session-analyzer/skills/* ~/.claude/skills/
 ```
 
 ## Usage

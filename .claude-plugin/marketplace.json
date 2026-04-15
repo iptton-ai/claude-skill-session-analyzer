@@ -1,0 +1,19 @@
+{
+  "name": "session-analyzer",
+  "owner": {
+    "name": "iptton"
+  },
+  "metadata": {
+    "description": "Claude Code session analyzer - identify pain points, track trends, improve CLAUDE.md"
+  },
+  "plugins": [
+    {
+      "name": "session-analyzer",
+      "source": "./",
+      "description": "Analyze Claude Code session history to identify recurring issues, track improvement trends, and generate actionable CLAUDE.md update suggestions",
+      "homepage": "https://github.com/iptton-ai/claude-skill-session-analyzer",
+      "license": "MIT",
+      "keywords": ["session-analysis", "analytics", "claude-md", "productivity", "trends"]
+    }
+  ]
+}

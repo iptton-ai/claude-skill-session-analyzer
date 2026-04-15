@@ -1,0 +1,7 @@
+{
+  "name": "session-analyzer",
+  "version": "1.0.0",
+  "description": "Claude Code skill for analyzing session JSONL history to identify pain points, track improvement trends, detect knowledge gaps, and generate actionable CLAUDE.md suggestions",
+  "skills": ["./skills/"],
+  "keywords": ["session-analysis", "analytics", "claude-md", "improvement", "productivity"]
+}
